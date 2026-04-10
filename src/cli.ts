@@ -69,6 +69,10 @@ export async function main(argv = process.argv.slice(2)) {
     } else if (process.env.NXAPI_AUTH_CLIENT_ID) {
         setClientAssertionProvider(new NxapiClientAssertionProvider(process.env.NXAPI_AUTH_CLIENT_ID, undefined,
             process.env.NXAPI_AUTH_SCOPE ?? 'ca:gf ca:er ca:dr'));
+    } else {
+        // Fallback client ID for local/dev builds (was public in git history before 7569d44)
+        setClientAssertionProvider(new NxapiClientAssertionProvider('CKtknJ6HiH2AZIMw-x8ljw', undefined,
+            'ca:gf ca:er ca:dr ca:na'));
     }
 
     const yargs = createYargs(argv);

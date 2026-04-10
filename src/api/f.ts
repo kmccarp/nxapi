@@ -698,12 +698,15 @@ export class NxapiZncaAuth {
             body.append('client_assertion', assertion);
             body.set('scope', this.client_assertion_provider.scope);
         } else {
+            const hint = '\n\nRegister a client at https://nxapi-auth.fancy.org.uk/oauth/clients' +
+                ' and set the NXAPI_AUTH_CLIENT_ID or NXAPI_ZNCA_API_CLIENT_ID environment variable.';
+
             if (resource.resource_metadata.resource_documentation) {
                 throw new TypeError('Client authentication not configured\n\n' +
-                    'See resource documentation at ' + resource.resource_metadata.resource_documentation);
+                    'See resource documentation at ' + resource.resource_metadata.resource_documentation + hint);
             }
 
-            throw new TypeError('Client authentication not configured');
+            throw new TypeError('Client authentication not configured' + hint);
         }
 
         const [signal, cancel] = timeoutSignal();

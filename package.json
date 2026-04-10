@@ -1,6 +1,7 @@
 {
     "name": "nxapi",
     "version": "1.6.1",
+    "__nxapi_release": "v1.6.1",
     "description": "Nintendo Switch app APIs",
     "license": "AGPL-3.0-or-later",
     "author": "Ellie <ellie+nxapi@fancy.org.uk>",

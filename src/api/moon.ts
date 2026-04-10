@@ -7,13 +7,13 @@ import { timeoutSignal } from '../util/misc.js';
 
 const debug = createDebug('nxapi:api:moon');
 
-const MOON_URL = 'https://api-lp1.pctl.srv.nintendo.net/moon';
+const MOON_URL = 'https://app.lp1.znma.srv.nintendo.net';
 export const ZNMA_CLIENT_ID = '54789befb391a838';
 
-export const ZNMA_VERSION = '1.17.0';
-const ZNMA_BUILD = '261';
+export const ZNMA_VERSION = '2.4.0';
+const ZNMA_BUILD = '660';
 const ZNMA_USER_AGENT = 'moon_ANDROID/' + ZNMA_VERSION + ' (com.nintendo.znma; build:' + ZNMA_BUILD +
-    '; ANDROID 26)';
+    '; ANDROID 34)';
 
 export default class MoonApi {
     onTokenExpired: ((data?: MoonError, res?: Response) => Promise<MoonAuthData | PartialMoonAuthData | void>) | null = null;
@@ -57,8 +57,8 @@ export default class MoonApi {
                 'Content-Type': 'application/json; charset=utf-8',
                 'X-Moon-App-Id': 'com.nintendo.znma',
                 'X-Moon-Os': 'ANDROID',
-                'X-Moon-Os-Version': '26',
-                'X-Moon-Model': '',
+                'X-Moon-Os-Version': '34',
+                'X-Moon-Model': 'Pixel 4 XL',
                 'X-Moon-TimeZone': 'Europe/London',
                 'X-Moon-Os-Language': 'en-GB',
                 'X-Moon-App-Language': 'en-GB',
@@ -99,31 +99,58 @@ export default class MoonApi {
     }
 
     async getUser() {
+        // v2 API has no direct equivalent; this endpoint may no longer work
         return this.fetch<User>('/v1/users/' + this.naId);
     }
 
     async getSmartDevices() {
+        // v2 API has no direct equivalent; this endpoint may no longer work
         return this.fetch<SmartDevices>('/v1/users/' + this.naId + '/smart_devices');
     }
 
     async getDevices() {
-        return this.fetch<Devices>('/v1/users/' + this.naId + '/devices');
+        const raw = await this.fetch<any>('/v2/actions/user/fetchOwnedDevices');
+        raw.items = raw.ownedDevices ?? [];
+        raw.count = raw.items.length;
+        return raw as HasResponse<Devices, Response>;
     }
 
     async getDailySummaries(id: string) {
-        return this.fetch<DailySummaries>('/v1/devices/' + id + '/daily_summaries');
+        const raw = await this.fetch<any>(
+            '/v2/actions/playSummary/fetchDailySummaries?deviceId=' + id,
+        );
+        raw.items = raw.dailySummaries ?? [];
+        raw.count = raw.items.length;
+        raw.updatedRecently = raw.updatedRecently ?? true;
+        return raw as HasResponse<DailySummaries, Response>;
     }
 
     async getMonthlySummaries(id: string) {
-        return this.fetch<MonthlySummaries>('/v1/devices/' + id + '/monthly_summaries');
+        const raw = await this.fetch<any>(
+            '/v2/actions/playSummary/fetchLatestMonthlySummary?deviceId=' + id,
+        );
+        const available: {year: number; month: number}[] = raw.available ?? [];
+        raw.items = available.map(a => ({
+            deviceId: id,
+            month: a.year + '-' + String(a.month).padStart(2, '0'),
+        }));
+        raw.indexes = raw.items.map((i: any) => i.month);
+        raw.count = raw.items.length;
+        return raw as HasResponse<MonthlySummaries, Response>;
     }
 
     async getMonthlySummary(id: string, month: string) {
-        return this.fetch<MonthlySummary>('/v1/devices/' + id + '/monthly_summaries/' + month);
+        const [year, m] = month.split('-');
+        return this.fetch<MonthlySummary>(
+            '/v2/actions/playSummary/fetchMonthlySummary?deviceId=' + id +
+            '&year=' + year + '&month=' + parseInt(m) + '&containLatest=false',
+        );
     }
 
     async getParentalControlSettingState(id: string) {
-        return this.fetch<ParentalControlSettingState>('/v1/devices/' + id + '/parental_control_setting_state');
+        return this.fetch<ParentalControlSettingState>(
+            '/v2/actions/parentalControlSetting/fetchParentalControlSetting?deviceId=' + id,
+        );
     }
 
     async renewToken(token: string) {
@@ -159,7 +186,7 @@ export default class MoonApi {
         if (!config) throw new Error('Remote configuration prevents Moon authentication');
 
         const znma_useragent = 'moon_ANDROID/' + config.znma_version +
-            ' (com.nintendo.znma; build:' + config.znma_build + '; ANDROID 26)';
+            ' (com.nintendo.znma; build:' + config.znma_build + '; ANDROID 34)';
 
         // Nintendo Account token
         const nintendoAccountToken = await getNintendoAccountToken(token, ZNMA_CLIENT_ID);

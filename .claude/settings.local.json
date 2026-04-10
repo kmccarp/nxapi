@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(find src:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

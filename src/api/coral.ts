@@ -513,6 +513,8 @@ export default class CoralApi extends AbstractCoralApi implements CoralApiInterf
     async getCurrentUser() {
         return this.call<CurrentUser<true>, {id: number}>('/v4/User/ShowSelf', {
             id: this[CoralUserIdSymbol],
+
+            [RequestFlagAddPlatformSymbol]: true,
         });
     }
 
