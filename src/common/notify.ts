@@ -19,6 +19,7 @@ export class ZncNotifications extends Loop {
     user_notifications = true;
     friend_notifications = true;
     update_interval = 30;
+    protected _server_unreachable = false;
 
     constructor(
         public user: CoralUser<CoralApiInterface>,
@@ -91,10 +92,22 @@ export class ZncNotifications extends Loop {
 
         await this.updatePresenceForNotifications(user as CurrentUser<false>, friends, this.user.data.user.id, false);
         if (user) await this.updatePresenceForSplatNet2Monitors([user as CurrentUser<false>]);
+
+        if (this._server_unreachable) {
+            this._server_unreachable = false;
+            this.notifications.onServerReachable?.();
+        }
     }
 
     async handleError(err: ErrorResponse<CoralError> | NodeJS.ErrnoException): Promise<LoopResult> {
-        return handleError(err, this);
+        const result = await handleError(err, this);
+
+        if (!this._server_unreachable) {
+            this._server_unreachable = true;
+            this.notifications.onServerUnreachable?.();
+        }
+
+        return result;
     }
 }
 
@@ -105,6 +118,9 @@ export class NotificationManager {
     onFriendOffline?(friend: CurrentUser<false> | Friend, prev?: CurrentUser<false> | Friend, naid?: string, ir?: boolean): void;
     onFriendPlayingChangeTitle?(friend: CurrentUser<false> | Friend, prev?: CurrentUser<false> | Friend, naid?: string, ir?: boolean): void;
     onFriendTitleStateChange?(friend: CurrentUser<false> | Friend, prev?: CurrentUser<false> | Friend, naid?: string, ir?: boolean): void;
+
+    onServerUnreachable?(): void;
+    onServerReachable?(): void;
 
     onlinefriends = new Map</** NA ID */ string, (CurrentUser<false> | Friend)[]>();
     accounts = new Map</** NSA ID */ string, /** NA ID */ string>();

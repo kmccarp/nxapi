@@ -180,6 +180,20 @@ export class TerminalNotificationManager extends NotificationManager {
         });
     }
 
+    onServerUnreachable() {
+        this.notifier.notify({
+            title: 'Nintendo Switch Online',
+            message: 'Server is unreachable',
+        });
+    }
+
+    onServerReachable() {
+        this.notifier.notify({
+            title: 'Nintendo Switch Online',
+            message: 'Server connection restored',
+        });
+    }
+
     static async create() {
         const notifier = (await import('node-notifier')).default;
 

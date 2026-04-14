@@ -458,6 +458,11 @@ export class ZncDiscordPresence extends ZncNotifications {
 
         await this.updatePresenceForNotifications(user as CurrentUser<false>, friends, this.user.data.user.id, false);
         if (user) await this.updatePresenceForSplatNet2Monitors([user as CurrentUser<false>]);
+
+        if (this._server_unreachable) {
+            this._server_unreachable = false;
+            this.notifications.onServerReachable?.();
+        }
     }
 
     async onStop() {

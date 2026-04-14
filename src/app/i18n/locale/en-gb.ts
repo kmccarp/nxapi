@@ -92,6 +92,10 @@ export const menus = {
 export const notifications = {
     playing: 'Playing {{name}}',
     offline: 'Offline',
+    server_unreachable_title: 'Nintendo Switch Online',
+    server_unreachable: 'Server is unreachable',
+    server_reachable_title: 'Nintendo Switch Online',
+    server_reachable: 'Server connection restored',
 };
 
 export const handle_uri = {

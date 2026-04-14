@@ -614,6 +614,20 @@ export class ElectronNotificationManager extends NotificationManager {
             icon: await tryGetNativeImageFromUrl(friend.image2Uri),
         }).show();
     }
+
+    onServerUnreachable() {
+        new Notification({
+            title: this.t('server_unreachable_title')!,
+            body: this.t('server_unreachable')!,
+        }).show();
+    }
+
+    onServerReachable() {
+        new Notification({
+            title: this.t('server_reachable_title')!,
+            body: this.t('server_reachable')!,
+        }).show();
+    }
 }
 
 function checkShouldIgnorePresenceMonitorError(err: Error): boolean {
