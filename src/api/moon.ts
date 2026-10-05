@@ -10,8 +10,8 @@ const debug = createDebug('nxapi:api:moon');
 const MOON_URL = 'https://app.lp1.znma.srv.nintendo.net';
 export const ZNMA_CLIENT_ID = '54789befb391a838';
 
-export const ZNMA_VERSION = '2.4.0';
-const ZNMA_BUILD = '660';
+export const ZNMA_VERSION = '2.6.0';
+const ZNMA_BUILD = '700';
 const ZNMA_USER_AGENT = 'moon_ANDROID/' + ZNMA_VERSION + ' (com.nintendo.znma; build:' + ZNMA_BUILD +
     '; ANDROID 34)';
 
@@ -160,7 +160,7 @@ export default class MoonApi {
     }
 
     private setTokenWithSavedToken(data: MoonAuthData | PartialMoonAuthData) {
-        this.token = data.nintendoAccountToken.access_token!;
+        this.token = data.nintendoAccountToken.id_token!;
         if ('user' in data) this.naId = data.user.id;
         this._token_expired = false;
     }
@@ -172,7 +172,7 @@ export default class MoonApi {
 
     static createWithSavedToken(data: MoonAuthData) {
         return new this(
-            data.nintendoAccountToken.access_token!,
+            data.nintendoAccountToken.id_token!,
             data.user.id,
             data.znma_version,
             data.znma_build,
