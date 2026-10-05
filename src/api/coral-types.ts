@@ -57,8 +57,6 @@ export type CoralResponse<T = unknown> = CoralSuccessResponse<T> | CoralError;
 
 export interface AccountLoginParameter {
     naIdToken: string;
-    naBirthday: string;
-    naCountry: string;
     language: string;
     timestamp: number;
     requestId: string;
@@ -84,10 +82,25 @@ export type AccountToken = AccountLogin;
 /** /v4/Account/Login */
 export interface AccountLogin_4 {
     user: CurrentUser<false>;
+    naUser: NaUser;
     webApiServerCredential: {
         accessToken: string;
         expiresIn: number;
     };
+}
+
+export interface NaUser {
+    region: string | null;
+    /** obfuscated sign in id and/or email */
+    screenName: string;
+    country: string;
+    birthday: string;
+    language: string;
+    loginId: string | null;
+    id: string;
+    iconUri: string | null;
+    nickname: string;
+    email: string | null;
 }
 
 /** /v4/Account/GetToken, /v4/Extension/Account/GetToken */
@@ -95,7 +108,6 @@ export type AccountToken_4 = AccountLogin_4;
 
 export interface AccountTokenParameter {
     naIdToken: string;
-    naBirthday: string;
     timestamp: number;
     requestId: string;
     f: string;
@@ -520,6 +532,7 @@ export interface MediaBase {
     capturedAt: number;
     expiresAt: number;
     uploadedAt: number;
+    hashtags: string;
 }
 
 export type Media = MediaImage | MediaVideo;
@@ -543,6 +556,10 @@ export enum MediaPlatform {
 
 export interface ListMediaParameter {
     count: 100;
+}
+
+export interface DeleteMediaParameter {
+    mediaIds: string[];
 }
 
 /** /v5/Hashtag/List */
